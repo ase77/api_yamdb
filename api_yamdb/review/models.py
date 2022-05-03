@@ -33,7 +33,7 @@ class Genre(models.Model):
     )
 
     class Meta:
-        vebose_name = 'Жанр'
+        verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
 
     def __str__(self):
@@ -55,9 +55,10 @@ class Title(models.Model):
         null=True,
         verbose_name='Описание'
     )
-    genres = models.ManyToManyField(Genre)
+    genres = models.ManyToManyField(Genre, related_name='titles')
     category = models.ForeignKey(
         Category,
+        null=True,
         on_delete=models.SET_NULL,
         related_name='titles',
         verbose_name='Категория'
