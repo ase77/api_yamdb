@@ -2,11 +2,14 @@ from rest_framework import viewsets, permissions
 
 from django.shortcuts import get_object_or_404
 
-from review.models import Title, Review, Comment
-from .permissions import AuthOrReadOnly
+from review.models import Title, Review, Comment, Category, Genre
+from .permissions import AdminOrReadOnly, AuthOrReadOnly
 from .serializers import (
+    CategorySerializer,
     CommentSerializer,
+    GenreSerializer,
     ReviewSerializer,
+    TitleSerializer,
 )
 
 
@@ -42,3 +45,21 @@ class CommentViewSet(viewsets.ModelViewSet):
         review_id = self.kwargs.get('review_id')
         review = get_object_or_404(Review, pk=review_id)
         serializer.save(author=self.request.user, review=review)
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = (AdminOrReadOnly,)
+
+
+class GenreViewSet(viewsets.ModelViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    permission_classes = (AdminOrReadOnly,)
+
+
+class TitileViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
+    permission_classes = (AdminOrReadOnly,)
