@@ -19,12 +19,12 @@ class UserManager(BaseUserManager):
     def create_user(self, username, email, password=None, **kwargs):
         if not username or not email:
             raise ValueError('User must have username and email')
-        
+
         user = self.model(username=username, email=email, **kwargs)
         user.set_password(password)
         user.save(using=self.db)
         return user
-    
+
     def create_superuser(self, username, email, password, **kwargs):
         user = self.create_user(username, email, password, **kwargs)
         user.is_admin = True
@@ -42,13 +42,25 @@ class User(AbstractBaseUser):
         (UserRole.ADMIN, UserRole.ADMIN)
     )
 
-    username = models.CharField(unique=True, null=False, blank=False, max_length=150)
-    email = models.EmailField(unique=True, null=False, blank=False, max_length=254)
-    confirmation_code = models.CharField(null=True, blank=True, max_length=150)
-    first_name = models.CharField(null=True, blank=True, max_length=150)
-    last_name = models.CharField(null=True, blank=True, max_length=150)
+    username = models.CharField(
+        unique=True, null=False, blank=False, max_length=150
+    )
+    email = models.EmailField(
+        unique=True, null=False, blank=False, max_length=254
+    )
+    confirmation_code = models.CharField(
+        null=True, blank=True, max_length=150
+    )
+    first_name = models.CharField(
+        null=True, blank=True, max_length=150
+    )
+    last_name = models.CharField(
+        null=True, blank=True, max_length=150
+    )
     bio = models.TextField(blank=True, null=True)
-    role = models.CharField(max_length=150, choices=ROLES_CHOICES, default=UserRole.USER)
+    role = models.CharField(
+        max_length=150, choices=ROLES_CHOICES, default=UserRole.USER
+    )
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
