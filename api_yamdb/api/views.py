@@ -8,7 +8,11 @@ from django.core.mail import send_mail
 from rest_framework_simplejwt.views import TokenViewBase
 
 from review.models import Title, Review, Comment, Category, Genre, User
-from .permissions import AdminOrReadOnly, AuthOrReadOnly, AdminOnly
+from .permissions import (
+    AdminOrReadOnly,
+    AdminOnly,
+    AuthorModeratorAdminOrReadOnly
+)
 from .serializers import (
     CategorySerializer,
     CommentSerializer,
@@ -72,8 +76,7 @@ class MeView(views.APIView):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = (
-        AuthOrReadOnly, permissions.IsAuthenticatedOrReadOnly)
+    permission_classes = (AuthorModeratorAdminOrReadOnly, )
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
@@ -88,14 +91,12 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = (
-        AuthOrReadOnly, permissions.IsAuthenticatedOrReadOnly)
+    permission_classes = (AuthorModeratorAdminOrReadOnly, )
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
-        title = get_object_or_404(Title, pk=title_id)
         review_id = self.kwargs.get('review_id')
-        review = get_object_or_404(Review, pk=review_id, title=title)
+        review = get_object_or_404(Review, pk=review_id, title=title_id)
         return Comment.objects.filter(review=review)
 
     def perform_create(self, serializer):
