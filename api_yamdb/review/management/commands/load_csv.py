@@ -2,8 +2,15 @@ from csv import DictReader
 
 from django.core.management import BaseCommand
 
-from review.models import Genre, Category, Title
-
+from review.models import (
+    User,
+    Genre,
+    Category,
+    Title,
+    GenreTitle,
+    Review,
+    Comment
+)
 
 ALREDY_LOADED_ERROR_MESSAGE = """
 If you need to reload the child data from the CSV file,
@@ -11,31 +18,32 @@ first delete the db.sqlite3 file to destroy the database.
 Then, run `python manage.py migrate` for a new empty
 database with tables"""
 
+class_list = (User, Category, Genre, Title, GenreTitle, Review, Comment)
+
 
 class Command(BaseCommand):
-    help = "Loads data from genre.csv"
 
     def handle(self, *args, **options):
-        if Genre.objects.exists():
-            print('genre data already loaded...exiting.')
-            print(ALREDY_LOADED_ERROR_MESSAGE)
-            return
-        print("Loading genre data")
+        for value in class_list:
+            if value.objects.exists():
+                print(f'''{value.__name__} data already loaded
+                {ALREDY_LOADED_ERROR_MESSAGE}
+                ''')
+            else:
+                print(f'Loading {value.__name__} data')
 
         for row in DictReader(
-                open('./static/data/genre.csv', encoding="utf8")):
-            genre = Genre(
+                open('./static/data/users.csv', encoding="utf8")):
+            user = User(
                 id=row['id'],
-                name=row['name'],
-                slug=row['slug']
+                username=row['username'],
+                email=row['email'],
+                role=row['role'],
+                bio=row['bio'],
+                first_name=row['first_name'],
+                last_name=row['last_name'],
             )
-            genre.save()
-
-        if Category.objects.exists():
-            print('category data already loaded...exiting.')
-            print(ALREDY_LOADED_ERROR_MESSAGE)
-            return
-        print("Loading category data")
+            user.save()
 
         for row in DictReader(
                 open('./static/data/category.csv', encoding="utf8")):
@@ -46,18 +54,53 @@ class Command(BaseCommand):
             )
             category.save()
 
-        # if Title.objects.exists():
-        #     print('title data already loaded...exiting.')
-        #     print(ALREDY_LOADED_ERROR_MESSAGE)
-        #     return
-        # print("Loading titles data")
+        for row in DictReader(
+                open('./static/data/genre.csv', encoding="utf8")):
+            genre = Genre(
+                id=row['id'],
+                name=row['name'],
+                slug=row['slug']
+            )
+            genre.save()
 
-        # for row in DictReader(
-        #         open('./static/data/titles.csv', encoding="utf8")):
-        #     title = Title(
-        #         id=row['id'],
-        #         name=row['name'],
-        #         year=row['year'],
-        #         category=row['category']
-        #     )
-        #     title.save()
+        for row in DictReader(
+                open('./static/data/titles.csv', encoding="utf8")):
+            title = Title(
+                id=row['id'],
+                name=row['name'],
+                year=row['year'],
+                category_id=row['category']
+            )
+            title.save()
+
+        for row in DictReader(
+                open('./static/data/genre_title.csv', encoding="utf8")):
+            genre_title = GenreTitle(
+                id=row['id'],
+                title_id=row['title_id'],
+                genre_id=row['genre_id']
+            )
+            genre_title.save()
+
+        for row in DictReader(
+                open('./static/data/review.csv', encoding="utf8")):
+            review = Review(
+                id=row['id'],
+                title_id=row['title_id'],
+                text=row['text'],
+                author_id=row['author'],
+                score=row['score'],
+                pub_date=row['pub_date']
+            )
+            review.save()
+
+        for row in DictReader(
+                open('./static/data/comments.csv', encoding="utf8")):
+            comment = Comment(
+                id=row['id'],
+                review_id=row['review_id'],
+                text=row['text'],
+                author_id=row['author'],
+                pub_date=row['pub_date']
+            )
+            comment.save()
