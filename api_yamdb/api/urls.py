@@ -7,7 +7,7 @@ from .views import (
     CommentViewSet,
     CategoryViewSet,
     GenreViewSet,
-    TitileViewSet,
+    TitleViewSet,
     UserModelViewSet,
     UserRegistrationView,
     TokenObtainView,
@@ -23,7 +23,7 @@ router_v1.register(
     CommentViewSet, basename='comments')
 router_v1.register('categories', CategoryViewSet)
 router_v1.register('genres', GenreViewSet)
-router_v1.register('titles', TitileViewSet)
+router_v1.register('titles', TitleViewSet, basename='titles')
 router_v1.register('users', UserModelViewSet)
 
 

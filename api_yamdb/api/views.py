@@ -1,11 +1,12 @@
 import uuid
 
-from rest_framework import views, viewsets, permissions, status
+from rest_framework import filters, views, viewsets, permissions, status
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.core.mail import send_mail
 from rest_framework_simplejwt.views import TokenViewBase
+from django_filters.rest_framework import DjangoFilterBackend
 
 from review.models import Title, Review, Comment, Category, Genre, User
 from .permissions import (
@@ -112,6 +113,15 @@ class CategoryViewSet(viewsets.ModelViewSet):
         permissions.IsAuthenticatedOrReadOnly,
         AdminOrReadOnly
     )
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+    lookup_field = 'slug'
+
+    def retrieve(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def update(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class GenreViewSet(viewsets.ModelViewSet):
@@ -121,9 +131,37 @@ class GenreViewSet(viewsets.ModelViewSet):
         permissions.IsAuthenticatedOrReadOnly,
         AdminOrReadOnly
     )
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+    lookup_field = 'slug'
+
+    def retrieve(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def update(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-class TitileViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
+class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     permission_classes = (AdminOrReadOnly,)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('year',)
+
+    def get_queryset(self):
+        queryset = Title.objects.all()
+        slug = self.request.query_params.get('genre')
+        if slug is not None:
+            genre = Genre.objects.get(slug=slug)
+            queryset = queryset.filter(genre=genre)
+            return queryset
+        slug = self.request.query_params.get('category')
+        if slug is not None:
+            category = Category.objects.get(slug=slug)
+            queryset = queryset.filter(category=category)
+            return queryset
+        name = self.request.query_params.get('name')
+        if name is not None:
+            queryset = queryset.filter(name__startswith=name)
+            return queryset
+        return queryset

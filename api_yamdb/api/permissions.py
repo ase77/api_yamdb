@@ -30,10 +30,9 @@ class AuthorModeratorAdminOrReadOnly(permissions.BasePermission):
 class AdminOrReadOnly(permissions.BasePermission):
 
     def has_permission(self, request, view):
-        return (
-            request.method in permissions.SAFE_METHODS
-            or request.user.role == UserRole.ADMIN
-        )
+        if request.user.is_anonymous:
+            return request.method in permissions.SAFE_METHODS
+        return request.user.role == UserRole.ADMIN
 
     def has_object_permission(self, request, obj, view):
         if request.method == 'GET':
