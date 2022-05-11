@@ -6,7 +6,6 @@ from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.core.mail import send_mail
 from rest_framework_simplejwt.views import TokenViewBase
-from django_filters.rest_framework import DjangoFilterBackend
 
 from review.models import Title, Review, Comment, Category, Genre, User
 from .permissions import (
@@ -145,23 +144,21 @@ class GenreViewSet(viewsets.ModelViewSet):
 class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     permission_classes = (AdminOrReadOnly,)
-    filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('year',)
 
     def get_queryset(self):
         queryset = Title.objects.all()
-        slug = self.request.query_params.get('genre')
-        if slug is not None:
-            genre = Genre.objects.get(slug=slug)
+        genre_slug = self.request.query_params.get('genre')
+        if genre_slug is not None:
+            genre = Genre.objects.get(slug=genre_slug)
             queryset = queryset.filter(genre=genre)
-            return queryset
-        slug = self.request.query_params.get('category')
-        if slug is not None:
-            category = Category.objects.get(slug=slug)
+        category_slug = self.request.query_params.get('category')
+        if category_slug is not None:
+            category = Category.objects.get(slug=category_slug)
             queryset = queryset.filter(category=category)
-            return queryset
+        year = self.request.query_params.get('year')
+        if year is not None:
+            queryset = queryset.filter(year=year)
         name = self.request.query_params.get('name')
         if name is not None:
             queryset = queryset.filter(name__startswith=name)
-            return queryset
         return queryset
