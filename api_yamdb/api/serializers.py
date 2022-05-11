@@ -117,7 +117,16 @@ class TitleSerializer(serializers.ModelSerializer):
         slug_field='slug',
         queryset=Category.objects.all()
     )
+    rating = serializers.SerializerMethodField()
 
     class Meta:
         fields = '__all__'
         model = Title
+
+    def get_rating(self, obj):
+        reviews = obj.reviews.all()
+        if len(reviews) == 0:
+            return None
+        score_list = [getattr(review, 'score') for review in list(reviews)]
+        average_score = round(sum(score_list)/len(score_list))
+        return average_score
