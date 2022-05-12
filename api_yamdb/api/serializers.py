@@ -141,5 +141,5 @@ class TitleSerializer(serializers.ModelSerializer):
         if len(reviews) == 0:
             return None
         score_list = [getattr(review, 'score') for review in list(reviews)]
-        average_score = round(sum(score_list)/len(score_list))
+        average_score = round(sum(score_list) / len(score_list))
         return average_score
