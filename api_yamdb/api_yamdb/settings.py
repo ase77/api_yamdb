@@ -22,12 +22,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # 3d party
     'rest_framework',
     'django_filters',
-    # local
     'api',
-    'review',
+    'reviews',
 ]
 
 MIDDLEWARE = [
@@ -151,7 +149,7 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': datetime.timedelta(days=1),
 }
 
-AUTH_USER_MODEL = 'review.User'
+AUTH_USER_MODEL = 'reviews.User'
 
 AUTH_EMAIL = 'confirmation@api_yamdb.com'
 

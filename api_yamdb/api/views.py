@@ -8,7 +8,7 @@ from django.core.mail import send_mail
 from rest_framework_simplejwt.views import TokenViewBase
 from django_filters.rest_framework import DjangoFilterBackend
 
-from review.models import Title, Review, Comment, Category, Genre, User
+from reviews.models import Title, Review, Comment, Category, Genre, User
 from .permissions import (
     AdminOrReadOnly,
     AdminOnly,
@@ -77,7 +77,9 @@ class MeView(views.APIView):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = (AuthorModeratorAdminOrReadOnly, )
+    permission_classes = (
+        permissions.IsAuthenticatedOrReadOnly,
+        AuthorModeratorAdminOrReadOnly, )
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
@@ -92,7 +94,9 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = (AuthorModeratorAdminOrReadOnly, )
+    permission_classes = (
+        permissions.IsAuthenticatedOrReadOnly,
+        AuthorModeratorAdminOrReadOnly, )
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')

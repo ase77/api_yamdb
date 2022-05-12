@@ -1,8 +1,9 @@
 from rest_framework import serializers, exceptions
 from rest_framework_simplejwt.serializers import TokenObtainSerializer
 from rest_framework_simplejwt.tokens import AccessToken
+from django.shortcuts import get_object_or_404
 
-from review.models import (
+from reviews.models import (
     Review, Comment, Category, Genre, Title, User, UserRole
 )
 
@@ -74,6 +75,18 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ['id', 'text', 'author', 'score', 'pub_date']
         model = Review
+
+    def validate(self, data):
+        request = self.context['request']
+        if request.method == 'POST':
+            author = request.user
+            title_id = self.context['view'].kwargs.get('title_id')
+            title = get_object_or_404(Title, pk=title_id)
+            if Review.objects.filter(title=title, author=author).exists():
+                raise serializers.ValidationError(
+                    'Вы можете добавить однин отзыв на произведение'
+                )
+        return data
 
 
 class CommentSerializer(serializers.ModelSerializer):

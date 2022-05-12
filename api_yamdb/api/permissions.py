@@ -1,6 +1,6 @@
 from rest_framework import permissions
 
-from review.models import UserRole
+from reviews.models import UserRole
 
 
 class AdminOnly(permissions.BasePermission):

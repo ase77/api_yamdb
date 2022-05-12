@@ -2,7 +2,7 @@ from csv import DictReader
 
 from django.core.management import BaseCommand
 
-from review.models import (
+from reviews.models import (
     User,
     Genre,
     Category,
