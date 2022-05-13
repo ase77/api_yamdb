@@ -3,12 +3,69 @@ from django.core.validators import (
     MinValueValidator,
     RegexValidator
 )
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
 
 from api_yamdb.settings import CURRENT_YEAR
 
-User = get_user_model()
+
+class UserRole:
+    USER = 'user'
+    MODERATOR = 'moderator'
+    ADMIN = 'admin'
+
+
+class UserManager(BaseUserManager):
+    def create_user(self, username, email, password=None, **kwargs):
+        if not username or not email:
+            raise ValueError('User must have username and email')
+
+        user = self.model(username=username, email=email, **kwargs)
+        user.set_password(password)
+        user.save(using=self.db)
+        return user
+
+    def create_superuser(self, username, email, password, **kwargs):
+        user = self.create_user(username, email, password, **kwargs)
+        user.is_admin = True
+        user.is_staff = True
+        user.is_superuser = True
+        user.role = UserRole.ADMIN
+        user.save(using=self.db)
+        return user
+
+
+class User(AbstractBaseUser):
+    ROLES_CHOICES = (
+        (UserRole.USER, UserRole.USER),
+        (UserRole.MODERATOR, UserRole.MODERATOR),
+        (UserRole.ADMIN, UserRole.ADMIN)
+    )
+
+    username = models.CharField(
+        unique=True, null=False, blank=False, max_length=150
+    )
+    email = models.EmailField(
+        unique=True, null=False, blank=False, max_length=254
+    )
+    confirmation_code = models.CharField(
+        null=True, blank=True, max_length=150
+    )
+    first_name = models.CharField(
+        null=True, blank=True, max_length=150
+    )
+    last_name = models.CharField(
+        null=True, blank=True, max_length=150
+    )
+    bio = models.TextField(blank=True, null=True)
+    role = models.CharField(
+        max_length=150, choices=ROLES_CHOICES, default=UserRole.USER
+    )
+
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email']
+
+    objects = UserManager()
 
 
 class Category(models.Model):
@@ -52,13 +109,21 @@ class Title(models.Model):
         verbose_name='Год выпуска',
         validators=[MaxValueValidator(CURRENT_YEAR)]
     )
-    rating = models.IntegerField(default=None, verbose_name='Рейтинг')
+    rating = models.IntegerField(
+        default=None,
+        null=True,
+        verbose_name='Рейтинг'
+    )
     description = models.TextField(
         blank=True,
         null=True,
         verbose_name='Описание'
     )
-    genres = models.ManyToManyField(Genre, related_name='titles')
+    genre = models.ManyToManyField(
+        Genre,
+        through='GenreTitle',
+        related_name='titles'
+    )
     category = models.ForeignKey(
         Category,
         null=True,
@@ -73,6 +138,18 @@ class Title(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class GenreTitle(models.Model):
+    title = models.ForeignKey(Title, on_delete=models.CASCADE)
+    genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = 'Произведение и жанр'
+        verbose_name_plural = 'Произведения и жанры'
+
+    def __str__(self):
+        return f'{self.title} {self.genre}'
 
 
 class Review(models.Model):
@@ -100,6 +177,12 @@ class Review(models.Model):
         verbose_name_plural = 'Отзывы'
         verbose_name = 'Отзыв'
         ordering = ('-pub_date',)
+        constraints = [
+            models.UniqueConstraint(
+                fields=('title', 'author'),
+                name='one_review_for_title'
+            ),
+        ]
 
     def __str__(self):
         return self.text[:15]

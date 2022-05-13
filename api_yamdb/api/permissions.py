@@ -1,24 +1,40 @@
 from rest_framework import permissions
 
+from reviews.models import UserRole
 
-class AuthOrReadOnly(permissions.BasePermission):
 
-    def has_object_permission(sel, request, view, obj):
-        return (
-            request.method in permissions.SAFE_METHODS
-            or obj.author == request.user
-        )
+class AdminOnly(permissions.BasePermission):
+
+    def has_permission(self, request, view):
+        return request.user.role == UserRole.ADMIN
+
+
+class AuthorOrModeratorOrAdmin(permissions.BasePermission):
+
+    def has_object_permission(self, request, view, obj):
+        if request.user == obj.author:
+            return True
+
+        return request.user.role in (UserRole.MODERATOR, UserRole.ADMIN)
+
+
+class AuthorModeratorAdminOrReadOnly(permissions.BasePermission):
+
+    def has_object_permission(self, request, view, obj):
+        if (request.method in permissions.SAFE_METHODS
+                or request.user == obj.author):
+            return True
+        return request.user.role in (UserRole.MODERATOR, UserRole.ADMIN)
 
 
 class AdminOrReadOnly(permissions.BasePermission):
 
     def has_permission(self, request, view):
-        return (
-            request.method in permissions.SAFE_METHODS
-            or request.user.is_superuser
-        )
+        if request.user.is_anonymous:
+            return request.method in permissions.SAFE_METHODS
+        return request.user.role == UserRole.ADMIN
 
     def has_object_permission(self, request, obj, view):
         if request.method == 'GET':
             return True
-        return request.user.is_superuser
+        return request.user.role == UserRole.ADMIN
