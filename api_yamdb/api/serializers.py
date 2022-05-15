@@ -1,11 +1,9 @@
-from rest_framework import serializers, exceptions
+from django.shortcuts import get_object_or_404
+from rest_framework import exceptions, serializers
 from rest_framework_simplejwt.serializers import TokenObtainSerializer
 from rest_framework_simplejwt.tokens import AccessToken
-from django.shortcuts import get_object_or_404
-
-from reviews.models import (
-    Review, Comment, Category, Genre, Title, User, UserRole
-)
+from reviews.models import (Category, Comment, Genre, Review, Title, User,
+                            UserRole)
 
 
 class BaseUserSerializer:

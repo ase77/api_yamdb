@@ -1,12 +1,8 @@
-from django.core.validators import (
-    MaxValueValidator,
-    MinValueValidator,
-    RegexValidator
-)
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-from django.db import models
-
 from api_yamdb.settings import CURRENT_YEAR
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.core.validators import (MaxValueValidator, MinValueValidator,
+                                    RegexValidator)
+from django.db import models
 
 
 class UserRole:
