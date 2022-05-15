@@ -1,28 +1,19 @@
 import uuid
 
-from rest_framework import filters, views, viewsets, permissions, status
-from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404
+from rest_framework import filters, permissions, status, views, viewsets
+from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenViewBase
+from reviews.models import Category, Comment, Genre, Review, Title, User
 
-from reviews.models import Title, Review, Comment, Category, Genre, User
-from .permissions import (
-    AdminOrReadOnly,
-    AdminOnly,
-    AuthorModeratorAdminOrReadOnly
-)
-from .serializers import (
-    CategorySerializer,
-    CommentSerializer,
-    GenreSerializer,
-    ReviewSerializer,
-    TitleSerializer,
-    UserSerializer,
-    UserSignUpSerializer,
-    TokenSerializer
-)
+from .permissions import (AdminOnly, AdminOrReadOnly,
+                          AuthorModeratorAdminOrReadOnly)
+from .serializers import (CategorySerializer, CommentSerializer,
+                          GenreSerializer, ReviewSerializer, TitleSerializer,
+                          TokenSerializer, UserSerializer,
+                          UserSignUpSerializer)
 
 
 class UserRegistrationView(views.APIView):

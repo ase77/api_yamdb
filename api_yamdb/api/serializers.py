@@ -1,17 +1,17 @@
-from rest_framework import serializers, exceptions
+import datetime
+
+from django.shortcuts import get_object_or_404
+from rest_framework import exceptions, serializers
 from rest_framework_simplejwt.serializers import TokenObtainSerializer
 from rest_framework_simplejwt.tokens import AccessToken
-from django.shortcuts import get_object_or_404
-
-from reviews.models import (
-    Review, Comment, Category, Genre, Title, User, UserRole
-)
+from reviews.models import (Category, Comment, Genre, Review, Title, User,
+                            UserRole)
 
 
 class BaseUserSerializer:
     def validate_username(self, value):
         if value == 'me':
-            raise serializers.ValidationError('wrong username.')
+            raise serializers.ValidationError('username "me" is locked')
         return value
 
     def validate_role(self, value):
@@ -143,3 +143,9 @@ class TitleSerializer(serializers.ModelSerializer):
         score_list = [getattr(review, 'score') for review in list(reviews)]
         average_score = round(sum(score_list) / len(score_list))
         return average_score
+
+    def validate_year(self, value):
+        current_year = datetime.date.today().year
+        if not (0 < value <= current_year):
+            raise serializers.ValidationError('Проверьте год выпуска!')
+        return value

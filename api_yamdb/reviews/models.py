@@ -1,12 +1,7 @@
-from django.core.validators import (
-    MaxValueValidator,
-    MinValueValidator,
-    RegexValidator
-)
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.core.validators import (MaxValueValidator, MinValueValidator,
+                                    RegexValidator)
 from django.db import models
-
-from api_yamdb.settings import CURRENT_YEAR
 
 
 class UserRole:
@@ -43,10 +38,10 @@ class User(AbstractBaseUser):
     )
 
     username = models.CharField(
-        unique=True, null=False, blank=False, max_length=150
+        unique=True, max_length=150
     )
     email = models.EmailField(
-        unique=True, null=False, blank=False, max_length=254
+        unique=True, max_length=254
     )
     confirmation_code = models.CharField(
         null=True, blank=True, max_length=150
@@ -67,11 +62,14 @@ class User(AbstractBaseUser):
 
     objects = UserManager()
 
+    @property
+    def is_moderator_or_admin(self):
+        return self.role in (UserRole.MODERATOR, UserRole.ADMIN)
+
 
 class Category(models.Model):
     name = models.CharField(max_length=256)
     slug = models.SlugField(
-        max_length=50,
         unique=True,
         validators=[RegexValidator(regex='^[-a-zA-Z0-9_]+$')]
     )
@@ -87,7 +85,6 @@ class Category(models.Model):
 class Genre(models.Model):
     name = models.CharField(max_length=256)
     slug = models.SlugField(
-        max_length=50,
         unique=True,
         validators=[RegexValidator(regex='^[-a-zA-Z0-9_]+$')]
     )
@@ -106,8 +103,7 @@ class Title(models.Model):
         verbose_name='Название'
     )
     year = models.IntegerField(
-        verbose_name='Год выпуска',
-        validators=[MaxValueValidator(CURRENT_YEAR)]
+        verbose_name='Год выпуска'
     )
     rating = models.IntegerField(
         default=None,
