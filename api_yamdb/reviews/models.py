@@ -6,8 +6,6 @@ from django.core.validators import (
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
 
-from api_yamdb.settings import CURRENT_YEAR
-
 
 class UserRole:
     USER = 'user'
@@ -71,7 +69,6 @@ class User(AbstractBaseUser):
 class Category(models.Model):
     name = models.CharField(max_length=256)
     slug = models.SlugField(
-        max_length=50,
         unique=True,
         validators=[RegexValidator(regex='^[-a-zA-Z0-9_]+$')]
     )
@@ -87,7 +84,6 @@ class Category(models.Model):
 class Genre(models.Model):
     name = models.CharField(max_length=256)
     slug = models.SlugField(
-        max_length=50,
         unique=True,
         validators=[RegexValidator(regex='^[-a-zA-Z0-9_]+$')]
     )
@@ -106,8 +102,7 @@ class Title(models.Model):
         verbose_name='Название'
     )
     year = models.IntegerField(
-        verbose_name='Год выпуска',
-        validators=[MaxValueValidator(CURRENT_YEAR)]
+        verbose_name='Год выпуска'
     )
     rating = models.IntegerField(
         default=None,

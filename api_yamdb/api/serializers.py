@@ -1,3 +1,5 @@
+import datetime
+
 from rest_framework import serializers, exceptions
 from rest_framework_simplejwt.serializers import TokenObtainSerializer
 from rest_framework_simplejwt.tokens import AccessToken
@@ -143,3 +145,9 @@ class TitleSerializer(serializers.ModelSerializer):
         score_list = [getattr(review, 'score') for review in list(reviews)]
         average_score = round(sum(score_list) / len(score_list))
         return average_score
+
+    def validate_year(self, value):
+        current_year = datetime.date.today().year
+        if not (0 < value <= current_year):
+            raise serializers.ValidationError('Проверьте год выпуска!')
+        return value
