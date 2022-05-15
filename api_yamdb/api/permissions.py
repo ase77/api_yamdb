@@ -12,10 +12,9 @@ class AdminOnly(permissions.BasePermission):
 class AuthorOrModeratorOrAdmin(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
-        if request.user == obj.author:
+        if (request.user == obj.author
+                or request.user.role in (UserRole.MODERATOR, UserRole.ADMIN)):
             return True
-
-        return request.user.role in (UserRole.MODERATOR, UserRole.ADMIN)
 
 
 class AuthorModeratorAdminOrReadOnly(permissions.BasePermission):

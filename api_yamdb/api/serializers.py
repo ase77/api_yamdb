@@ -11,7 +11,7 @@ from reviews.models import (
 class BaseUserSerializer:
     def validate_username(self, value):
         if value == 'me':
-            raise serializers.ValidationError('wrong username.')
+            raise serializers.ValidationError('username "me" is locked')
         return value
 
     def validate_role(self, value):
