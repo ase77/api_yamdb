@@ -41,10 +41,10 @@ class User(AbstractBaseUser):
     )
 
     username = models.CharField(
-        unique=True, null=False, blank=False, max_length=150
+        unique=True, max_length=150
     )
     email = models.EmailField(
-        unique=True, null=False, blank=False, max_length=254
+        unique=True, max_length=254
     )
     confirmation_code = models.CharField(
         null=True, blank=True, max_length=150
@@ -64,6 +64,10 @@ class User(AbstractBaseUser):
     REQUIRED_FIELDS = ['email']
 
     objects = UserManager()
+
+    @property
+    def is_moderator_or_admin(self):
+        return self.role in (UserRole.MODERATOR, UserRole.ADMIN)
 
 
 class Category(models.Model):
