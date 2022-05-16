@@ -33,10 +33,13 @@ class GenreAdmin(admin.ModelAdmin):
 
 @admin.register(Title)
 class TitleAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'name', 'year', 'rating', 'genre', 'category')
+    list_display = ('case_name',)
     search_fields = ('name',)
     list_filter = ('genre', 'category')
     empty_value_display = VALUE_DISPLAY
+
+    def case_name(self, obj):
+        return ('%s %s %s %s' % (obj.name, obj.year, obj.genre, obj.category))
 
 
 @admin.register(Review)

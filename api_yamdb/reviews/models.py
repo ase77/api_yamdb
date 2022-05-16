@@ -44,15 +44,15 @@ class User(AbstractBaseUser):
         unique=True, max_length=254
     )
     confirmation_code = models.CharField(
-        null=True, blank=True, max_length=150
+        blank=True, max_length=150
     )
     first_name = models.CharField(
-        null=True, blank=True, max_length=150
+        blank=True, max_length=150
     )
     last_name = models.CharField(
-        null=True, blank=True, max_length=150
+        blank=True, max_length=150
     )
-    bio = models.TextField(blank=True, null=True)
+    bio = models.TextField(blank=True)
     role = models.CharField(
         max_length=150, choices=ROLES_CHOICES, default=UserRole.USER
     )
@@ -112,7 +112,6 @@ class Title(models.Model):
     )
     description = models.TextField(
         blank=True,
-        null=True,
         verbose_name='Описание'
     )
     genre = models.ManyToManyField(
