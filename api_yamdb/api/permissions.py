@@ -1,4 +1,5 @@
 from rest_framework import permissions
+
 from reviews.models import UserRole
 
 
@@ -32,6 +33,5 @@ class AdminOrReadOnly(permissions.BasePermission):
         return request.user.role == UserRole.ADMIN
 
     def has_object_permission(self, request, obj, view):
-        if request.method == 'GET':
+        if request.method == 'GET' or request.user.role == UserRole.ADMIN:
             return True
-        return request.user.role == UserRole.ADMIN
