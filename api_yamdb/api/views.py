@@ -6,8 +6,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework import filters, permissions, status, views, viewsets
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenViewBase
-from reviews.models import Category, Comment, Genre, Review, Title, User
 
+from reviews.models import Category, Comment, Genre, Review, Title, User
 from .permissions import (AdminOnly, AdminOrReadOnly,
                           AuthorModeratorAdminOrReadOnly)
 from .serializers import (CategorySerializer, CommentSerializer,
