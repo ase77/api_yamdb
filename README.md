@@ -1,3 +1,4 @@
+<a id="anchor"></a>
 # Проект YaMDb
 ## Описание:
 
@@ -453,3 +454,5 @@ python3 manage.py runserver
 Удаление пользователя по `username`:
 
 `DELETE http://127.0.0.1:8000/api/v1/users/{username}/`
+
+[__В начало__](#anchor) :point_up:
